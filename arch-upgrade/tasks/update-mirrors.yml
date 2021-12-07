@@ -1,0 +1,10 @@
+---
+
+# TODO: Update mirror list to use nearest available servers
+
+
+- name: Refresh pacmans package database
+  become: yes
+  community.general.pacman:
+    name: base         # Just to trigger the sync command
+    update_cache: yes

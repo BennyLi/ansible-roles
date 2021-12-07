@@ -1,0 +1,15 @@
+---
+
+- name: Update the pacman mirror list
+  import_tasks: update-mirrors.yml
+  tags:
+    - always
+    - pacman
+    - system-update
+
+- name: Upgrade all installed packages via pacman
+  import_tasks: upgrade-system.yml
+  tags:
+    - always
+    - pacman
+    - system-update
