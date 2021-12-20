@@ -1,0 +1,6 @@
+---
+
+- name: Install Psono - Password manager
+  import_tasks: psono.yml
+  tags:
+    - psono

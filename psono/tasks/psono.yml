@@ -1,0 +1,148 @@
+---
+
+- name: Ensure the Psono project directory exists
+  ansible.builtin.file:
+    state: directory
+    path: '{{ psono_project_path }}'
+  tags:
+    - psono:base
+    - psono:backup
+    - psono:restore
+
+- name: Ensure the Psono mount directories exists
+  ansible.builtin.file:
+    state: directory
+    path: '{{ item }}'
+  loop:
+    - '{{ psono_db_data_path }}'
+    - '{{ psono_db_init_path }}'
+    - '{{ psono_server_config_path }}'
+    - '{{ psono_client_config_path }}'
+  tags:
+    - psono:base
+    - psono:backup
+    - psono:restore
+
+- name: Copy backup script
+  ansible.builtin.template:
+    src: 'templates/backup_psono.sh.j2'
+    dest: '{{ psono_project_path }}/backup_psono.sh'
+    mode: u=rwx,g=r,o=
+  tags:
+    - psono:base
+    - psono:backup
+    - psono:restore
+
+
+
+
+################################################################################
+#
+# Restore the latest backup
+#
+################################################################################
+
+- name: Restore Psono backup and start Docker Compose stack
+  when: psono_use_backup == 'yes'
+  import_tasks: psono_restore.yml
+  tags:
+    - psono:restore
+
+
+
+
+################################################################################
+#
+# Create a new backup
+#
+################################################################################
+
+- name: Create Psono backup
+  when: psono_create_backup == 'yes' and psono_use_backup == 'no'
+  become: yes
+  ansible.builtin.shell: '{{ psono_project_path }}/backup_psono.sh'
+  tags:
+    - psono:backup
+
+
+
+
+
+################################################################################
+#
+# Fresh installation or update
+#
+################################################################################
+
+- name: Copy compose template file for Psono setup
+  when: psono_use_backup == 'no'
+  ansible.builtin.template:
+    src: 'templates/docker-compose.yml.j2'
+    dest: '{{ psono_project_path }}/docker-compose.yml'
+
+- name: Copy server settings template file for Psono setup
+  when: psono_use_backup == 'no'
+  ansible.builtin.template:
+    src: 'templates/settings.yml.j2'
+    dest: '{{ psono_server_config_path }}/settings.yml'
+
+- name: Copy server settings template file for Psono setup
+  when: psono_use_backup == 'no'
+  ansible.builtin.template:
+    src: 'templates/settings.yml.j2'
+    dest: '{{ psono_server_config_path }}/settings.yml'
+
+- name: Copy client configuration template file for Psono setup
+  when: psono_use_backup == 'no'
+  ansible.builtin.template:
+    src: 'templates/config.json.j2'
+    dest: '{{ psono_client_config_path }}/config.json'
+
+- name: Prepare / Migrate the Psono database
+  when: psono_use_backup == 'no'
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ psono_project_path }}'
+    profiles:
+      - migration
+    pull: yes
+    recreate: always
+
+- name: Start the Psono compose stack
+  when: psono_use_backup == 'no'
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ psono_project_path }}'
+    profiles:
+      - production
+    pull: yes
+    recreate: always
+
+- name: Wait for the Psono server to come up
+  when: psono_use_backup == 'no'
+  become: yes
+  community.docker.docker_container_exec:
+    container: psono_server
+    command: curl -f http://localhost/healthcheck/
+  register: psono_server_healthcheck
+  until: psono_server_healthcheck.rc == 0
+  retries: 20
+  delay: 3
+
+- name: Setup Psono users
+  when: psono_use_backup == 'no'
+  become: yes
+  community.docker.docker_container_exec:
+    container: psono_server
+    command: python3 ./psono/manage.py createuser '{{ item.username }}' '{{ item.password }}' '{{ item.email_address }}'
+  loop: "{{ psono_users }}"
+  no_log: true
+
+- name: Promote Psono admin users
+  become: yes
+  community.docker.docker_container_exec:
+    container: psono_server
+    command: python3 ./psono/manage.py promoteuser '{{ item.username }}' superuser
+  when: psono_use_backup == 'no' and item.superuser == 'yes'
+  loop: "{{ psono_users }}"
+  no_log: true

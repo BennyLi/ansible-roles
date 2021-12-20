@@ -1,0 +1,68 @@
+---
+
+# Global variables
+docker_projects_path: '/usr/src/docker_projects'
+local_backup_base_path: '/var/backups'
+
+################################################################################
+#
+# Psono - Password manager
+# Default values for all known variables.
+#
+################################################################################
+
+# The main Psono docker compose project path.
+psono_project_path: '{{ docker_projects_path }}/psono'
+
+# Restore a Psono stack from the last backup found in the psono_backup_path.
+psono_use_backup: 'yes'
+# Create a backup with this role execution.
+psono_create_backup: 'yes'
+# The main Psono backup path, where the backups will be stored.
+psono_backup_path: '{{ local_backup_base_path }}/psono'
+
+# Psono Docker host mount point for the Postgres data.
+psono_db_data_path: '{{ psono_project_path }}/db/data/postgres'
+# Psono Docker host mount point for Postgress db init scripts.
+psono_db_init_path: '{{ psono_project_path }}/db/initdb'
+
+# Folder, where the Psono server.config is stored.
+psono_server_config_path: '{{ psono_project_path }}/server/config'
+# Folder, where the Prono client.json is stored.
+psono_client_config_path: '{{ psono_project_path }}/client/config'
+
+# Private Docker network name for the Psono containers.
+psono_internal_network_name: 'psono-net'
+
+# Psono secrets. STORE THESE IN YOUR VAULT!
+psono_secret_key: '{{ vault_psono_secret_key }}'
+psono_activation_link_secret: '{{ vault_psono_activation_link_secret }}'
+psono_db_secret: '{{ vault_psono_db_secret }}'
+psono_db_password: '{{ vault_psono_db_password }}'
+psono_email_secret_salt: '{{ vault_psono_email_secret_salt }}'
+psono_private_key: '{{ vault_psono_private_key }}'
+psono_public_key: '{{ vault_psono_public_key }}'
+
+# Psono base domain. The specific service will become a subdomain each.
+psono_base_domain: 'passwort.example.com'
+# Psono subdomain for the web client.
+psono_domain: 'web.{{ psono_base_domain }}'
+# Psono subdomain for the admin client.
+psono_admin_domain: 'admin.{{ psono_base_domain }}'
+# Psono subdomain for the backend server.
+psono_server_domain: 'server.{{ psono_base_domain }}'
+
+# Mail server configuration for Psono to send mails to the user.
+psono_email_from: '{{ vault_psono_email_from }}'
+psono_email_host: '{{ vault_psono_email_host }}'
+psono_email_host_user: '{{ vault_psono_email_host_user }}'
+psono_email_host_password: '{{ vault_psono_email_host_password }}'
+
+# A list of users that will be configured.
+# Be sure to put THIS INSIDE YOUR VAULT !
+# This has to be a list in the following format:
+# vault_psono_users:
+#   - { username: 'user_a@passwort.example.com', password: 'superSecret1234', email_address: 'chuck@norris.com', superuser: 'yes' }
+#   - { username: 'user_x@passwort.example.com', password: 'fo0Bar!', email_address: 'foozy@baaaaar.com', superuser: 'no' }
+# Ensure that the username has the suffix '@{{ psono_base_domain }}'.
+psono_users: "{{ vault_psono_users }}"

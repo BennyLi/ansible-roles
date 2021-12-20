@@ -1,0 +1,143 @@
+---
+
+version: '3.8'
+
+services:
+  db:
+    container_name: psono_db
+    environment:
+      POSTGRES_USER: psono
+      POSTGRES_PASSWORD: {{ psono_db_password }}
+    image: postgres:13-alpine
+    networks:
+      - psono-net
+    profiles:
+      - migration
+      - production
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - {{ psono_db_data_path }}:/var/lib/postgresql/data
+      - {{ psono_db_init_path }}:/docker-entrypoint-initdb.d
+
+  db-migration:
+    container_name: psono_db_migrate
+    command: sh -c "sleep 10 && /usr/local/bin/python3 ./psono/manage.py migrate"
+    depends_on:
+      - db
+    image: psono/psono-server:latest
+    networks:
+      - psono-net
+    profiles:
+      - migration
+    restart: "no"
+    stdin_open: true
+    tty: true
+    volumes:
+      - {{ psono_server_config_path }}/settings.yml:/root/.psono_server/settings.yaml
+
+  redis:
+    container_name: psono_redis
+    image: redis:alpine
+    networks:
+      - psono-net
+    profiles:
+      - production
+    restart: unless-stopped
+
+  server:
+    container_name: psono_server
+    command: sh -c "sleep 10 && /bin/sh /root/configs/docker/cmd.sh"
+    depends_on:
+      - db
+      - redis
+    image: psono/psono-server:latest
+    networks:
+      - psono-net
+      - proxy-net
+    profiles:
+      - production
+    restart: unless-stopped
+    sysctls:
+      - net.core.somaxconn=65535
+    volumes:
+      - {{ psono_server_config_path }}/settings.yml:/root/.psono_server/settings.yaml
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: '{{ traefik_proxy_network_name }}'
+      traefik.http.middlewares.psono-server-https-redirect.redirectscheme.scheme: 'https'
+      traefik.http.routers.psono-server.entrypoints: 'http'
+      traefik.http.routers.psono-server.rule: 'Host(`{{ psono_server_domain }}`)'
+      traefik.http.routers.psono-server.middlewares: 'psono-server-https-redirect'
+      traefik.http.routers.psono-server-secure.entrypoints: 'https'
+      traefik.http.routers.psono-server-secure.rule: 'Host(`{{ psono_server_domain }}`)'
+      traefik.http.routers.psono-server-secure.middlewares: 'psono-server-ipwhitelist,secHeaders@file'
+      traefik.http.routers.psono-server-secure.tls: 'true'
+      traefik.http.routers.psono-server-secure.tls.certresolver: 'http'
+      traefik.http.routers.psono-server-secure.service: 'psono-server'
+      traefik.http.services.psono-server.loadbalancer.server.port: '80'
+      traefik.http.middlewares.psono-server-ipwhitelist.ipwhitelist.sourcerange: '{{ traefik_ip_whitelist }}'
+
+  client:
+    container_name: psono_client
+    image: psono/psono-client:latest
+    networks:
+      - psono-net
+      - proxy-net
+    profiles:
+      - production
+    restart: unless-stopped
+    volumes:
+      - {{ psono_client_config_path }}/config.json:/usr/share/nginx/html/config.json
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: '{{ traefik_proxy_network_name }}'
+      traefik.http.middlewares.psono-client-https-redirect.redirectscheme.scheme: 'https'
+      traefik.http.routers.psono-client.entrypoints: 'http'
+      traefik.http.routers.psono-client.rule: 'Host(`{{ psono_domain }}`)'
+      traefik.http.routers.psono-client.middlewares: 'psono-client-https-redirect'
+      traefik.http.routers.psono-client-secure.entrypoints: 'https'
+      traefik.http.routers.psono-client-secure.rule: 'Host(`{{ psono_domain }}`)'
+      traefik.http.routers.psono-client-secure.middlewares: 'psono-client-ipwhitelist,secHeaders@file'
+      traefik.http.routers.psono-client-secure.tls: 'true'
+      traefik.http.routers.psono-client-secure.tls.certresolver: 'http'
+      traefik.http.routers.psono-client-secure.service: 'psono-client'
+      traefik.http.services.psono-client.loadbalancer.server.port: '80'
+      traefik.http.middlewares.psono-client-ipwhitelist.ipwhitelist.sourcerange: '{{ traefik_ip_whitelist }}'
+
+  admin:
+    container_name: psono_admin
+    image: psono/psono-admin-client:latest
+    networks:
+      - psono-net
+      - proxy-net
+    profiles:
+      - production
+    restart: unless-stopped
+    volumes:
+      - {{ psono_client_config_path }}/config.json:/usr/share/nginx/html/portal/config.json
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: '{{ traefik_proxy_network_name }}'
+      traefik.http.middlewares.psono-admin-client-https-redirect.redirectscheme.scheme: 'https'
+      traefik.http.routers.psono-admin-client.entrypoints: 'http'
+      traefik.http.routers.psono-admin-client.rule: 'Host(`{{ psono_admin_domain }}`)'
+      traefik.http.routers.psono-admin-client.middlewares: 'psono-admin-client-https-redirect'
+      traefik.http.routers.psono-admin-client-secure.entrypoints: 'https'
+      traefik.http.routers.psono-admin-client-secure.rule: 'Host(`{{ psono_admin_domain }}`)'
+      traefik.http.routers.psono-admin-client-secure.middlewares: 'psono-admin-client-ipwhitelist,secHeaders@file'
+      traefik.http.routers.psono-admin-client-secure.tls: 'true'
+      traefik.http.routers.psono-admin-client-secure.tls.certresolver: 'http'
+      traefik.http.routers.psono-admin-client-secure.service: 'psono-admin-client'
+      traefik.http.services.psono-admin-client.loadbalancer.server.port: '80'
+      traefik.http.middlewares.psono-admin-client-ipwhitelist.ipwhitelist.sourcerange: '{{ traefik_ip_whitelist }}'
+
+networks:
+  psono-net:
+    name: {{ psono_internal_network_name }}
+    internal: true
+  proxy-net:
+    name: {{ traefik_proxy_network_name }}
+    external: true
+
+# vim: ft=yaml

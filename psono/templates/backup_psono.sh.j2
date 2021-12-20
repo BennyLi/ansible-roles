@@ -1,0 +1,63 @@
+#! /usr/bin/env bash
+
+PROJECT_PATH="{{ psono_project_path }}"
+BACKUP_DATE="$(date +%Y-%m-%d_%H%M)"
+BASE_BACKUP_PATH="{{ psono_backup_path }}"
+CURRENT_BACKUP_PATH="${BASE_BACKUP_PATH}/${BACKUP_DATE}"
+
+echo "########################################"
+echo "# Creating a new Psono backup !"
+echo "########################################"
+echo ""
+echo "Backup path is: $CURRENT_BACKUP_PATH"
+
+mkdir -p "$CURRENT_BACKUP_PATH"
+
+
+
+pushd "$PROJECT_PATH" > /dev/null
+
+echo "Putting everything into one .tar.gz file ..."
+tar --create \
+    --gzip \
+    --file "$CURRENT_BACKUP_PATH/psono_backup.tar.gz" \
+    --verbose \
+    "./"
+
+popd > /dev/null
+
+
+echo "[DONE]"
+exit 0
+
+
+
+
+
+################################################################################
+# OLD BACKUP SCRIPT
+
+
+CONTAINER_NAME="psono_db"
+POSTGRES_DB="psono"
+{% raw %}
+POSTGRES_USER="$(/usr/local/bin/docker container inspect --format='{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER_NAME" | grep POSTGRES_USER | cut -d = -f 2)"
+{% endraw %}
+
+PROJECT_PATH="{{ psono_project_path }}"
+BACKUP_DATE="$(date +%Y-%m-%d_%H%M)"
+BASE_BACKUP_PATH="{{ psono_backup_path }}"
+CURRENT_BACKUP_PATH="${BASE_BACKUP_PATH}/${BACKUP_DATE}"
+
+mkdir -p "$CURRENT_BACKUP_PATH"
+
+pushd "$PROJECT_PATH"
+tar --exclude="./db" -czf "$CURRENT_BACKUP_PATH/docker-project-dir.tar.gz" "./"
+popd
+
+/usr/local/bin/docker container exec -it "$CONTAINER_NAME" \
+  /usr/local/bin/pg_dumpall \
+    --data-only \
+    --username "$POSTGRES_USER" > "${CURRENT_BACKUP_PATH}/db_backup.sql"
+
+# vim: ft=sh

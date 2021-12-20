@@ -1,0 +1,40 @@
+---
+
+- name: Get last Psono backup
+  ansible.builtin.shell: ls -r '{{ psono_backup_path }}' | head -1
+  register: last_backup_out
+
+- ansible.builtin.set_fact:
+    last_backup: '{{ last_backup_out.stdout }}'
+
+- name: Check if there is already an old Psono project
+  ansible.builtin.stat:
+    path: '{{ psono_project_path }}/docker-compose.yml'
+  register: is_psono_project
+
+- name: Stop the Psono stack
+  when: is_psono_project.stat.exists
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ psono_project_path }}'
+    state: absent
+
+- name: Remove current project directory
+  ansible.builtin.file:
+    path: '{{ psono_project_path }}/*'
+    state: absent
+
+- name: Restore Psono backup
+  ansible.builtin.unarchive:
+    src: '{{ psono_backup_path }}/{{ last_backup }}/psono_backup.tar.gz'
+    dest: '{{ psono_project_path }}/'
+    remote_src: 'yes'
+
+- name: Start the Psono compose stack
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ psono_project_path }}'
+    profiles:
+      - production
+    pull: yes
+    recreate: always
