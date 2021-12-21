@@ -8,6 +8,7 @@ services:
     environment:
       POSTGRES_USER: psono
       POSTGRES_PASSWORD: {{ psono_db_password }}
+      TZ: Europe/Berlin
     image: postgres:13-alpine
     networks:
       - psono-net # has no internet connection
@@ -47,10 +48,12 @@ services:
 
   server:
     container_name: psono_server
-    command: sh -c "sleep 10 && /bin/sh /root/configs/docker/cmd.sh"
+    command: sh -c "/sbin/apk add --no-cache tzdata && sleep 10 && /bin/sh /root/configs/docker/cmd.sh"
     depends_on:
       - db
       - redis
+    environment:
+      TZ: Europe/Berlin
     image: psono/psono-server:latest
     networks:
       - psono-net # has no internet connection
@@ -81,6 +84,9 @@ services:
 
   client:
     container_name: psono_client
+    command: /bin/sh -c "/sbin/apk add --no-cache tzdata && /bin/sh /root/cmd.sh"
+    environment:
+      TZ: Europe/Berlin
     image: psono/psono-client:latest
     networks:
       - psono-net # has no internet connection
@@ -108,6 +114,9 @@ services:
 
   admin:
     container_name: psono_admin
+    command: /bin/sh -c "/sbin/apk add --no-cache tzdata && /bin/sh /root/cmd.sh"
+    environment:
+      TZ: Europe/Berlin
     image: psono/psono-admin-client:latest
     networks:
       - psono-net # has no internet connection
