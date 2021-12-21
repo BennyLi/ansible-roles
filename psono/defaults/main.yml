@@ -4,6 +4,10 @@
 docker_projects_path: '/usr/src/docker_projects'
 local_backup_base_path: '/var/backups'
 
+# Traefik related variables
+traefik_proxy_network_name: 'proxy-net'
+traefik_ip_whitelist: '127.0.0.1/32, 192.168.189.0/24, 10.0.0.0/24'
+
 ################################################################################
 #
 # Psono - Password manager
@@ -15,7 +19,7 @@ local_backup_base_path: '/var/backups'
 psono_project_path: '{{ docker_projects_path }}/psono'
 
 # Restore a Psono stack from the last backup found in the psono_backup_path.
-psono_use_backup: 'yes'
+psono_use_backup: 'no'
 # Create a backup with this role execution.
 psono_create_backup: 'yes'
 # The main Psono backup path, where the backups will be stored.

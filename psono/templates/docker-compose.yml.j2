@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: {{ psono_db_password }}
     image: postgres:13-alpine
     networks:
-      - psono-net
+      - psono-net # has no internet connection
     profiles:
       - migration
       - production
@@ -27,7 +27,7 @@ services:
       - db
     image: psono/psono-server:latest
     networks:
-      - psono-net
+      - psono-net # has no internet connection
     profiles:
       - migration
     restart: "no"
@@ -40,7 +40,7 @@ services:
     container_name: psono_redis
     image: redis:alpine
     networks:
-      - psono-net
+      - psono-net # has no internet connection
     profiles:
       - production
     restart: unless-stopped
@@ -53,13 +53,14 @@ services:
       - redis
     image: psono/psono-server:latest
     networks:
-      - psono-net
-      - proxy-net
+      - psono-net # has no internet connection
+      - proxy-net # has internet connection
     profiles:
       - production
     restart: unless-stopped
-    sysctls:
-      - net.core.somaxconn=65535
+    # Only enable this is you have very high load on your installation.
+    #sysctls:
+    #  - net.core.somaxconn=65535
     volumes:
       - {{ psono_server_config_path }}/settings.yml:/root/.psono_server/settings.yaml
     labels:
@@ -82,8 +83,8 @@ services:
     container_name: psono_client
     image: psono/psono-client:latest
     networks:
-      - psono-net
-      - proxy-net
+      - psono-net # has no internet connection
+      - proxy-net # has internet connection
     profiles:
       - production
     restart: unless-stopped
@@ -109,8 +110,8 @@ services:
     container_name: psono_admin
     image: psono/psono-admin-client:latest
     networks:
-      - psono-net
-      - proxy-net
+      - psono-net # has no internet connection
+      - proxy-net # has internet connection
     profiles:
       - production
     restart: unless-stopped
@@ -138,6 +139,6 @@ networks:
     internal: true
   proxy-net:
     name: {{ traefik_proxy_network_name }}
-    external: true
+    external: true # Should be created by the Traefik setup
 
 # vim: ft=yaml

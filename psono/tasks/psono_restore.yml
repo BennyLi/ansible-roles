@@ -12,7 +12,7 @@
     path: '{{ psono_project_path }}/docker-compose.yml'
   register: is_psono_project
 
-- name: Stop the Psono stack
+- name: Stop the Psono stack if there is already one
   when: is_psono_project.stat.exists
   become: yes
   community.docker.docker_compose:
