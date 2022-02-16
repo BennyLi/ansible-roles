@@ -1,0 +1,6 @@
+---
+
+- name: Install Wofi
+  become: yes
+  community.general.pacman:
+    name: wofi

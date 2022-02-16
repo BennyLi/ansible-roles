@@ -1,0 +1,14 @@
+---
+
+- name: Install Rofimoji
+  become: yes
+  community.general.pacman:
+    name: rofimoji
+
+- name: Install a character type and copy tool for Wayland
+  when: display_server == "wayland"
+  become: yes
+  community.general.pacman:
+    name:
+      - wtype
+      - wl-clipboard

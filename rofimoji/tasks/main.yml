@@ -1,0 +1,6 @@
+---
+
+- name: Setup Rofimoji - A character picker for rofi/wofi
+  import_tasks: rofimoji.yml
+  tags:
+    - rofimoji

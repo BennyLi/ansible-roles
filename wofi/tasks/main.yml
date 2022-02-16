@@ -1,0 +1,6 @@
+---
+
+- name: Setup Wofi - a launcher program for wlroots based wayland compositors
+  import_tasks: wofi.yml
+  tags:
+    - wofi

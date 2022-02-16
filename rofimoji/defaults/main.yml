@@ -1,0 +1,5 @@
+---
+
+# The display server technology you use.
+# Can be "wayland" or "x11"
+display_server: "wayland"
