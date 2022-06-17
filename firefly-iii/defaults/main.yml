@@ -1,0 +1,35 @@
+---
+
+docker_projects_path: '/docker/projects'
+backup_basepath:      '/backups/docker'
+
+traefik_project_path: '{{ docker_projects_path }}/traefik'
+traefik_macvlan_ip:   '192.168.0.2'
+traefik_localnet_whitelist: '192.168.0.0/24'
+
+firefly_project_path:      '{{ docker_projects_path }}/firefly-iii'
+firefly_mount_upload_path: '{{ firefly_project_path }}/mounts/firefly_upload'
+firefly_mount_dbdata_path: '{{ firefly_project_path }}/mounts/mysql_data'
+firefly_backup_basepath:   '{{ backup_basepath }}/firefly'
+
+firefly_hostname:    'firefly.example.com'
+firefly_site_owner_mail_address: 'owner@example.com'
+
+firefly_app_key:     'SomeRandomStringOf32CharsExactly'
+firefly_cron_token:  'SomeOtherRandomStringOf32CharsEx'
+
+firefly_redis_hostname: 'firefly-redis'
+
+firefly_db_hostname: 'firefly-db'
+firefly_db_port:     '3306'
+firefly_db_name:     'firefly'
+firefly_db_username: 'firefly'
+firefly_db_password: 'firefly'
+
+firefly_mail_host:         'smtp.example.com'
+firefly_mail_from_address: 'mail@example.com'
+firefly_mail_username:     'user@example.com'
+firefly_mail_password:     'mailPassword'
+
+firefly_map_latitude:  '52.5202981'
+firefly_map_longitude: '13.413648'

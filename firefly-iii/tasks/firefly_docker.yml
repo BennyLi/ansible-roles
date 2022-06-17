@@ -1,0 +1,38 @@
+---
+
+- name: Ensure the project directory exists
+  ansible.builtin.file:
+    path:  '{{ firefly_project_path }}'
+    state: directory
+
+- name: Ensure Docker mount points exist
+  ansible.builtin.file:
+    path:  '{{ item }}'
+    state: directory
+  loop:
+    - '{{ firefly_mount_dbdata_path }}'
+    - '{{ firefly_mount_upload_path }}'
+
+- name: Copy docker-compose.yml
+  ansible.builtin.template:
+    src:  '{{ dockerfiles_path }}/firefly-iii/docker-compose.yml'
+    dest: '{{ firefly_project_path }}/docker-compose.yml'
+
+- name: Copy Firefly III environment config files
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/firefly-iii/{{ item }}'
+    dest: '{{ firefly_project_path }}/{{ item }}'
+  loop:
+    - app.env
+    - db.env
+
+- name: Copy Traefik config for Firefly III application
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/firefly-iii/firefly.traefik.yml'
+    dest: '{{ traefik_project_path }}/data/dynamic_conf/firefly.traefik.yml'
+
+- name: Start the Firefly III compose stack
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ firefly_project_path }}'
+    pull:        yes

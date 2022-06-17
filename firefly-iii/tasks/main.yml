@@ -1,0 +1,26 @@
+---
+
+- name: Setup Firefly III - Docker
+  import_tasks: firefly_docker.yml
+  tags:
+    - firefly
+    - firefly:docker
+
+- name: Setup Firefly III - Backup and Update
+  import_tasks: firefly_backup.yml
+  tags:
+    - firefly
+    - firefly:backup
+    - firefly:update
+
+- name: Add Firefly III domain to PiHole
+  delegate_to:  'pihole'
+  import_tasks: '{{ dockerfiles_path }}/pihole/tasks/pihole_dns_update.yml'
+  vars:
+    domain:     '{{ firefly_hostname }}'
+    target_ip:  '{{ traefik_macvlan_ip }}'
+  tags:
+    - firefly
+    - firefly:dns
+    - pihole
+    - pihole:firefly

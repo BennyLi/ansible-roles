@@ -1,0 +1,7 @@
+---
+
+- name: Copy the backup and update script
+  ansible.builtin.template:
+    src:  '{{ dockerfiles_path }}/firefly-iii/backup-update-and-restart.sh'
+    dest: '{{ firefly_project_path }}/backup-update-and-restart.sh'
+    mode: 'u=rwx,g=rx,o=r'
