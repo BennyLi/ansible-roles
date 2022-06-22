@@ -1,0 +1,26 @@
+---
+
+public_dotfiles_path: '/home/.dotfiles'
+dockerfiles_path:     '/home/.dockerfiles'
+
+homelab_macvlan_name:     'homelab-net'
+homelab_network_subnet:   '192.168.0.0/24'
+base_network_device_name: 'eth0'
+
+
+docker_projects_path: '/docker/projects'
+
+traefik_project_path:       '{{ docker_projects_path }}/traefik'
+traefik_proxy_network_name: 'proxy-net'
+traefik_localnet_whitelist: '192.168.0.0/24'
+
+pihole_project_path:        '{{ docker_projects_path }}/pihole'
+pihole_mount_config_path:   '{{ pihole_project_path }}/mounts/config'
+pihole_mount_dnsmasq_path:  '{{ pihole_project_path }}/mounts/dnsmasq'
+
+pihole_hostname:   'pihole.example.com'
+pihole_macvlan_ip: '192.168.0.3'
+
+pihole_webpassword: 'super-secure'
+pihole_admin_email: 'webmaster@pihole.example.com'
+pihole_upstream_dns_server: '8.8.8.8;8.8.4.4'

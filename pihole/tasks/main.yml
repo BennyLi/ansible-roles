@@ -1,0 +1,6 @@
+---
+
+- name: Setup PiHole
+  import_tasks: pihole_docker.yml
+  tags:
+    - pihole

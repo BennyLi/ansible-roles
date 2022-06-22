@@ -1,0 +1,35 @@
+---
+
+- name: Ensure the project directory exists
+  ansible.builtin.file:
+    path:  '{{ pihole_project_path }}'
+    state: directory
+
+- name: Ensure Docker mount points exist
+  ansible.builtin.file:
+    path:  '{{ item }}'
+    state: directory
+  loop:
+    - '{{ pihole_mount_config_path }}'
+    - '{{ pihole_mount_dnsmasq_path }}'
+
+- name: Copy docker-compose.yml
+  ansible.builtin.template:
+    src:  '{{ dockerfiles_path }}/pihole/docker-compose.yml'
+    dest: '{{ pihole_project_path }}/docker-compose.yml'
+
+- name: Copy PiHole environment config files
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/pihole/app.env'
+    dest: '{{ pihole_project_path }}/app.env'
+
+- name: Copy Traefik config for PiHole application
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/pihole/pihole.traefik.yml'
+    dest: '{{ traefik_project_path }}/data/dynamic_conf/pihole.traefik.yml'
+
+- name: Start the PiHole compose stack
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ pihole_project_path }}'
+    pull:        yes
