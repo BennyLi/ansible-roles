@@ -1,0 +1,16 @@
+---
+
+- name: Add simple DNS entry
+  become: yes
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/pihole/dnsmasq-custom.conf.j2'
+    dest: '{{ pihole_mount_dnsmasq_path }}/{{ params_app_name }}.conf'
+    owner: 'root'
+    group: 'root'
+    mode:  'u=rw,g=r,o=r'
+
+- name: Restart PiHole DNS server
+  become: yes
+  ansible.builtin.shell: /bin/docker-compose exec pihole pihole restartdns
+  args:
+    chdir: '{{ pihole_project_path }}'

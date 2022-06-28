@@ -1,9 +1,0 @@
----
-
-- name: Show PiHole version for testing
-  ansible.builtin.shell: pihole version
-  register: pihole_version
-
-- name: Debug PiHole version
-  debug: 
-    var: pihole_version
