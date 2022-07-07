@@ -4,13 +4,14 @@
   become: yes
   ansible.builtin.template:
     src:  '{{ public_dotfiles_path }}/pihole/dnsmasq-custom.conf.j2'
-    dest: '{{ pihole_mount_dnsmasq_path }}/{{ params_app_name }}.conf'
+    dest: '{{ pihole_mount_dnsmasq_path }}/99-{{ params_app_name }}.conf'
     owner: 'root'
     group: 'root'
     mode:  'u=rw,g=r,o=r'
 
 - name: Restart PiHole DNS server
   become: yes
-  ansible.builtin.shell: /bin/docker-compose exec pihole pihole restartdns
+  ansible.builtin.shell: /bin/docker-compose exec --detach pihole pihole restartdns
   args:
     chdir: '{{ pihole_project_path }}'
+    warn:  no
