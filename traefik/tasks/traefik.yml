@@ -1,0 +1,60 @@
+---
+
+- name: Ensure Traefik project and data directory exists
+  ansible.builtin.file:
+    path:  '{{ traefik_project_path }}/data'
+    state: directory
+
+- name: Ensure Docker mount points exist
+  ansible.builtin.file:
+    path:  '{{ item }}'
+    state: directory
+  loop:
+    - '{{ traefik_mount_config_path }}'
+    - '{{ traefik_mount_dynamic_conf_path }}'
+
+- name: Ensure acme.json file for the Let's encrypt challenge exists
+  ansible.builtin.file:
+    state: touch
+    path:  '{{ traefik_mount_config_path }}/acme.json'
+    mode:  0600
+
+- name: Copy Traefik config
+  ansible.builtin.template:
+    src: '{{ public_dotfiles_path }}/traefik/traefik.yml'
+    dest: '{{ traefik_mount_config_path }}/traefik.yml'
+
+- name: Copy Traefiks dynamic config files
+  ansible.builtin.template:
+    src: '{{ public_dotfiles_path }}/traefik/dynamic_conf/{{ item }}'
+    dest: '{{ traefik_mount_dynamic_conf_path }}/{{ item }}'
+  loop:
+    - basic-auth.middleware.yml
+    - https-redirect.middleware.yml
+    - local-ipwhitelist.middleware.yml
+    - security-header.middleware.yml
+    - tls-options.yml
+    - traefik.service.yml
+
+- name: Ensure Python passlib is installed
+  become: yes
+  ansible.builtin.shell: pip install passlib
+
+- name: Set Traefik Basic Auth users
+  community.general.htpasswd:
+    path:     '{{ traefik_mount_config_path }}/traefik.htpasswd'
+    name:     '{{ traefik_username }}'
+    password: '{{ traefik_password }}'
+    mode:     0640
+
+- name: Copy docker compose file for Traefik
+  ansible.builtin.template:
+    src:  '{{ dockerfiles_path }}/traefik/docker-compose.yml'
+    dest: '{{ traefik_project_path }}/docker-compose.yml'
+
+- name: Start Traefik compose stack
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ traefik_project_path }}'
+    pull: yes
+    recreate: always

@@ -1,0 +1,35 @@
+---
+
+#
+# Local things
+#
+  public_dotfiles_path:      '/home/.dotfiles'
+  dockerfiles_path:          '/home/.dockerfiles'
+
+
+#
+# Remote things
+#
+  docker_projects_path:            '/volume1/docker/projects'
+
+
+#
+# Traefik
+#
+  traefik_project_path:            '{{ docker_projects_path }}/traefik'
+  traefik_mount_config_path:       '{{ traefik_project_path }}/mounts/config'
+  traefik_mount_dynamic_conf_path: '{{ traefik_project_path }}/mounts/config/dynamic_conf'
+
+  traefik_proxy_network_name:       'proxy-net'
+  traefik_proxy_network_subnet:     '172.1.123.0/24'
+  traefik_proxy_network_gateway_ip: '172.1.123.1'
+  traefik_proxy_network_proxy_ip:   '172.1.123.2'
+  traefik_macvlan_ip:               '192.168.0.2'
+
+  traefik_localnet_whitelist:       [ '192.168.0.0/24' ]
+
+  traefik_webmaster_mail_address:   'webmaster@example.com'
+  traefik_domain:                   'traefik.example.com'
+  traefik_htpasswd_file_path:       '/traefik.htpasswd'      # Path inside the container
+  traefik_username:                 'user'
+  traefik_password:                 'password'

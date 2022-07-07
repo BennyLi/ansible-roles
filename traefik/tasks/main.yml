@@ -1,0 +1,13 @@
+---
+
+- name: Setup Traefik - An open-source Edge Router
+  import_tasks: traefik.yml
+  tags:
+    - traefik
+
+- name: Traefik Pi-Hole integration
+  when: pihole_enabled
+  import_tasks: traefik_pihole.yml
+  tags:
+    - traefik
+    - traefik:dns
