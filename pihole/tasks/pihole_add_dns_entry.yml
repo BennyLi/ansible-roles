@@ -1,6 +1,6 @@
 ---
 
-- name: Add simple DNS entry
+- name: Add simple DNS entry to Pi-Hole
   become: yes
   ansible.builtin.template:
     src:  '{{ public_dotfiles_path }}/pihole/dnsmasq-custom.conf.j2'
@@ -9,7 +9,14 @@
     group: 'root'
     mode:  'u=rw,g=r,o=r'
 
-- name: Restart PiHole DNS server
+- name: Add local 'hosts' file entry for Synology
+  become: yes
+  ansible.builtin.lineinfile:
+    path:   /etc/hosts
+    regexp: '^{{ params_ip }} {{ params_domain }}'
+    line:   '{{ params_ip }} {{ params_domain }}'
+
+- name: Restart Pi-Hole DNS server
   become: yes
   ansible.builtin.shell: /bin/docker-compose exec --detach pihole pihole restartdns
   args:
