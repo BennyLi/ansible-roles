@@ -1,0 +1,13 @@
+---
+
+- name: RPi - Disable wifi module via boot config
+  ansible.builtin.lineinfile:
+    path: /boot/config.txt
+    regexp: '^dtoverlay=pi3-disable-wifi'
+    line: dtoverlay=pi3-disable-wifi
+
+- name: RPi - Disable bluetooth module via boot config
+  ansible.builtin.lineinfile:
+    path: /boot/config.txt
+    regexp: '^dtoverlay=pi3-disable-bt'
+    line: dtoverlay=pi3-disable-bt

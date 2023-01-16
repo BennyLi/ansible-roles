@@ -1,0 +1,41 @@
+# We assume here, that you setup your Raspberry Pi with the official Imager:
+#   https://www.raspberrypi.com/documentation/computers/getting-started.html#using-raspberry-pi-imager
+# The recommended "Advanced Options" are:
+#   * Enable SSH --> Allow public key authentication only
+
+
+# Disable wireless interface
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#disable-wireless-interfaces
+
+
+# Configure SMTP client
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#configure-smtp-client
+
+
+# Configure automatic security updates
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#configure-automatic-updates
+
+
+# Hardening | ssh configuration
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#ssh-configuration
+
+
+# Hardening | firewall configuration
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#firewall-configuration
+
+
+# Hardening | fail2ban configuration
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#fail2ban-configuration
+
+
+# Hardening | psad configuration
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#psad-configuration
+
+
+# Security Monitoring | Wazuh agent install + configuration
+# Dependency: ossec Server (like Security Onion)
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#install-ossec-agent
+
+
+# Security Monitoring | logwatch
+# https://chrisapproved.com/blog/raspberry-pi-hardening.html#configure-logwatch
