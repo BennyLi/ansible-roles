@@ -1,0 +1,16 @@
+---
+
+- name: Install SMTP client packages
+  ansible.builtin.package:
+    name:
+      - msmtp
+      - msmtp-mta
+    state: present
+
+- name: Copy msmtprc
+  ansible.builtin.template:
+    src: '{{ public_dotfiles_path }}/msmtp/msmtprc.j2'
+    dest: /etc/msmtprc
+    owner: root
+    group: root
+    mode: 'u=rw,g=r,o='

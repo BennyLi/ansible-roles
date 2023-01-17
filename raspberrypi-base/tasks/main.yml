@@ -1,15 +1,26 @@
+---
+
 # We assume here, that you setup your Raspberry Pi with the official Imager:
 #   https://www.raspberrypi.com/documentation/computers/getting-started.html#using-raspberry-pi-imager
 # The recommended "Advanced Options" are:
 #   * Enable SSH --> Allow public key authentication only
 
 
-# Disable wireless interface
 # https://chrisapproved.com/blog/raspberry-pi-hardening.html#disable-wireless-interfaces
+- name: Disable wireless interface
+  import_tasks: disable-wireless.yml
+  tags:
+    - raspberrypi
+    - raspberrypi:disable-wireless
 
 
-# Configure SMTP client
+# 
 # https://chrisapproved.com/blog/raspberry-pi-hardening.html#configure-smtp-client
+- name: Configure SMTP client
+  import_tasks: smtp-client.yml
+  tags:
+    - raspberrypi
+    - raspberrypi:smtp-client
 
 
 # Configure automatic security updates
