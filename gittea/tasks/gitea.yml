@@ -1,0 +1,19 @@
+---
+
+- name: Ensure the Docker project directory exists
+  ansible.builtin.file:
+    path:   "{{ gitea_project_dir }}"
+    state:  directory
+
+- name: Ensure the Docker mount directories exists
+  ansible.builtin.file:
+    path:   "{{ item }}"
+    state:  directory
+  loop:
+    - "{{ gitea_docker_host_mountpoint }}"
+    - "{{ gitea_db_docker_host_mountpoint }}"
+
+- name: Copy the Docker Compose template
+  ansible.builtin.template:
+    src:   templates/docker-compose.yml.j2
+    dest:  "{{ gitea_project_dir }}/docker-compose.yml"

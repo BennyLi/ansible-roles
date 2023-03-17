@@ -1,0 +1,7 @@
+---
+
+docker_projects_base_path: "/usr/local/src/docker_projects"
+gitea_project_dir: "{{ docker_projects_base_path }}/gitea"
+
+gitea_docker_host_mountpoint: "{{ gitea_project_dir }}/mounts/gitea_data"
+gitea_db_docker_host_mountpoint: "{{ gitea_project_dir }}/mounts/gitea_db_data"

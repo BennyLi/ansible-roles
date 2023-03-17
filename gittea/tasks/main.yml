@@ -1,0 +1,6 @@
+---
+
+- name: Setup Gitea - Git with a cup of tea
+  import_tasks: gitea.yml
+  tags:
+    - gitea

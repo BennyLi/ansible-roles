@@ -1,0 +1,68 @@
+version: "3"
+
+networks:
+  gitea-net:
+    name: gitea-net
+    internal: true
+  proxy-net:
+    name: proxy-net
+    external: true
+
+volumes:
+  gitea:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '{{ gitea_docker_host_mountpoint }}'
+  postgres:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '{{ gitea_db_docker_host_mountpoint }}'
+
+services:
+  server:
+    image: gitea/gitea:1.13
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=postgres
+      - DB_HOST=db:5432
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+      - RUN_MODE=prod
+      - DOMAIN=git.boxli.de
+      - SSH_DOMAIN=git.boxli.de
+      - SSH_PORT=3022
+      - SSH_LISTEN_PORT=22
+      - ROOT_URL=git.boxli.de
+      - DISABLE_REGISTRATION=true
+      - REQUIRE_SIGNIN_VIEW=true
+      - INSTALL_LOCK=true
+    restart: always
+    networks:
+      - gitea
+    volumes:
+      - gitea:/data
+    ports:
+      - "3080:3080"
+      - "3022:22"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:9.6
+    restart: always
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    networks:
+      - gitea
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+# vim: ft=yaml:
