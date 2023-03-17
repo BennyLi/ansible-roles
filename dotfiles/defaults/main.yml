@@ -1,0 +1,4 @@
+---
+
+user_name: john
+dotfiles_path: '/home/{{ user_name }}/.dotfiles'

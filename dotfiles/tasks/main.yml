@@ -1,0 +1,7 @@
+---
+
+- name: Setup executables
+  import_tasks: bin_scripts.yml
+  tags:
+    - dotfiles
+    - dotfiles:bin

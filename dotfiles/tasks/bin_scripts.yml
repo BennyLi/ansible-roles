@@ -1,0 +1,17 @@
+---
+
+- name: Find public bin scripts inside the dotfiles repo
+  ansible.builtin.find:
+    paths:  '{{ dotfiles_path }}/public/bin/'
+  register: public_bin_files
+
+- name: Link public bin scripts from dotfiles repo
+  become: yes
+  ansible.builtin.file:
+    src:   '{{ item.path }}'
+    dest:  '/usr/local/bin/{{ item.path | regex_replace(".sh$") | basename }}'
+    state: link
+    owner: '{{ user_name }}'
+    group: '{{ user_group }}'
+    mode:  u=rwx,g=rx,o=rx
+  loop: '{{ public_bin_files.files }}'
