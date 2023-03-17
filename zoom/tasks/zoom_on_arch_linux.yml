@@ -1,0 +1,87 @@
+---
+
+- name: Install Zomm client package dependencies
+  become: yes
+  community.general.pacman:
+    name:
+      - fontconfig
+      - glib2
+      - ibus
+      - libpulse
+      - libsm
+      - ttf-font
+      - libx11
+      - libxcb
+      - libxcomposite
+      - libxfixes
+      - libxi
+      - libxcursor
+      - libxkbcommon-x11
+      - libxrandr
+      - libxrender
+      - libxshmfence
+      - libxslt
+      - mesa
+      - nss
+      - xcb-util-image
+      - xcb-util-keysyms
+
+- name: Get Zoom client aur source
+  ansible.builtin.git:
+    repo: https://aur.archlinux.org/zoom.git
+    dest: '{{ aur_src_dir }}/zoom'
+
+- name: Make the Zoom client package
+  become: yes
+  become_user: '{{ aur_build_user }}'
+  ansible.builtin.shell: makepkg --clean --force
+  args:
+    chdir: '{{ aur_src_dir }}/zoom'
+
+- name: Install the Zoom client package
+  become: yes
+  ansible.builtin.shell: |
+    package_name="$(grep pkgbase .SRCINFO | sed -rn 's/.* = (.*)$/\1/p')"
+    version="$(grep pkgver .SRCINFO | sed -rn 's/.* = (.*)$/\1/p')"
+    build_version="$(grep pkgrel .SRCINFO | sed -rn 's/.* = (.*)$/\1/p')"
+    host_arch="$(uname -m)"
+    if [ "$(grep $host_arch .SRCINFO)" != "" ]
+    then
+      arch="$host_arch"
+    else
+      arch="any"
+    fi
+
+    build_pkg_ext="$(grep PKGEXT /etc/makepkg.conf | sed -rn "s/.*='(.*)'/\1/p")"
+
+    pacman \
+      --upgrade \
+      --noconfirm \
+      "$package_name-$version-$build_version-$arch$build_pkg_ext"
+  args:
+    chdir: '{{ aur_src_dir }}/zoom'
+
+- name: Fix some directory permissions for Zoom client installation
+  become: yes
+  ansible.builtin.file:
+    state: directory
+    path: '/opt/zoom'
+    mode: o+rx
+    recurse: yes
+
+- name: Fix some more file permissions for Zoom client installation
+  become: yes
+  ansible.builtin.file:
+    path: '{{ item }}'
+    mode: o+r
+  loop:
+    - /usr/share/applications/Zoom.desktop
+    - /usr/share/pixmaps/Zoom.png
+
+- name: Config Zoom to use the default and not the emebedded browser
+  ansible.builtin.lineinfile:
+    path: /home/{{ user_name }}/.config/zoomus.conf
+    create: yes
+    regexp: '^embeddedBrowserForSSOLogin=false'
+    line:   'embeddedBrowserForSSOLogin=false'
+    insertafter: '^[General]'

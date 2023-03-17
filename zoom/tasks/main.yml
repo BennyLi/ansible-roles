@@ -1,0 +1,7 @@
+---
+
+- name: Install Zoom client on Arch Linux based systems
+  import_tasks: zoom_on_arch_linux.yml
+  when: ansible_distribution == 'Archlinux'
+  tags:
+    - zoom
