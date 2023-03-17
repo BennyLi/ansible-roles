@@ -1,0 +1,32 @@
+---
+
+- name: Install fontconfig
+  become: yes
+  community.general.pacman:
+    name: fontconfig
+    state: latest
+  tags:
+    - fonts
+
+- name: Install some default fonts
+  import_tasks: default_fonts.yml
+  tags:
+    - fonts
+
+- name: Setup directories and config files
+  import_tasks: folders_and_configs.yml
+  tags:
+    - fonts
+    - fonts:config
+
+      #- name: Hack Nerd Font
+      #  import_tasks: hack_nerd_font.yml
+      #  tags:
+      #    - fonts
+      #    - fonts:nerd
+      #    - fonts:nerd:hack
+
+- name: Build the font cache
+  ansible.builtin.shell: fc-cache -f "/home/{{ user_name }}/.local/share/fonts/"
+  tags:
+    - fonts
