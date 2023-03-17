@@ -1,0 +1,80 @@
+# Replace vim with neovim
+alias vim="nvim"
+
+# Quick open config files {{{1
+alias ea="vim ~/.aliases"
+alias ev="vim ~/.vimrc"
+alias ei3="vim ~/.config/i3/config"
+alias es="vim ~/.config/sway/config"
+alias eb="vim ~/.bashrc"
+alias err="vim ~/.config/ranger/rc.conf"
+alias ers="vim ~/.config/ranger/scope.sh"
+
+# Quickly move to frequently used directories {{{1
+alias cdlad="cd ~/development/laptop-setup/arch-linux-playbook"
+alias cdlap="cd ~/.ansible_playbook"
+alias cdlac="cd ~/.ansible_config"
+alias cdlar="cd ~/.ansible_roles"
+alias cdld="cd ~/.dockerfiles"
+alias cd.="cd ~/.dotfiles"
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+# iteratec specifics {{{2
+if [ -d ~/Development/iteratec ]
+then
+  alias cdi="cd ~/Development/iteratec"
+  alias cdioo="cd ~/Development/iteratec/osm/OpenSpeedMonitor"
+  alias cdiod="cd ~/Development/iteratec/osm/docker-dev-environment"
+  alias cdih="cd ~/Development/iteratec/hlag_customer_feedback_app"
+fi
+
+# Directory and file listings {{{1
+alias ls="lsd --group-dirs first"
+alias ll="lsd --group-dirs first --date relative --almost-all --human-readable --long"
+alias lt="lsd --group-dirs first --date relative --almost-all --human-readable --long --tree"
+
+alias ccat="pygmentize -O full,style=base16-bright"
+
+# Better copy with rsync {{{1
+alias cp="rsync --archive --verbose --progress"
+
+# More secure deletion
+alias rm="rm --interactive=always"
+
+# SystemD shortcuts {{{1
+alias scs="sudo systemctl status"
+complete -F _systemctl scs
+
+# Docker shortcuts {{{1
+if type docker > /dev/null; then
+  source /usr/share/bash-completion/completions/docker
+  alias di="docker image"
+  complete -F _docker di
+  alias dc="docker container"
+  complete -F _docker dc
+  alias dv="docker volume"
+  complete -F _docker dv
+  alias dn="docker network"
+  complete -F _docker dn
+fi
+
+
+# Tasks shortcuts {{{1
+alias next="clear && task +next"
+complete -o nospace -F _task next
+alias n="next"
+complete -o nospace -F _task n
+alias tp="task projects"
+complete -o nospace -F _task tp
+alias tt="task tags"
+complete -o nospace -F _task tt
+alias ta="task add"
+complete -o nospace -F _task ta
+alias te="task edit"
+complete -o nospace -F _task te
+
+# vim: set ft=sh:

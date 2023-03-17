@@ -1,0 +1,7 @@
+---
+
+- name: Setup Bash shell
+  import_tasks: bash.yml
+  tags:
+    - shell
+    - bash

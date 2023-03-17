@@ -1,0 +1,39 @@
+---
+
+- name: Install Bash shell
+  become: yes
+  community.general.pacman:
+    name: bash
+    state: latest
+
+- name: Install Bash shell extensions
+  become: yes
+  community.general.pacman:
+    name: 
+      - bash-completion
+      - pkgfile 
+    state: latest
+
+- name: Install tools used in my Bash config files
+  become: yes
+  community.general.pacman:
+    name:
+      - lsd
+      - rsync
+      - tree
+    state: latest
+
+- name: Sync pkgfile database
+  become: yes
+  ansible.builtin.shell: pkgfile --update
+
+- name: Link configuration files
+  ansible.builtin.file:
+    src: "{{ role_path }}/files/{{ item }}"
+    dest: "/home/{{ user_name }}/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - .bashrc
+    - .bashrc_prompt
+    - .aliases
