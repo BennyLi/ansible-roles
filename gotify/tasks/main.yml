@@ -1,0 +1,33 @@
+---
+
+- name: Setup Gotify instance
+  import_tasks: gotify_docker.yml
+  tags:
+    - gotify
+    - gotify:docker
+
+- name: Setup Gotify users
+  loop: '{{ gotify_additional_users }}'
+  include_tasks:
+    file: gotify_add_user.yml
+    apply:
+      tags:
+        - gotify
+        - gotify:user
+  tags:
+    - gotify
+    - gotify:user
+
+- name: Gotify Traefik integration
+  when: traefik_enabled
+  import_tasks: gotify_traefik.yml
+  tags:
+    - gotify
+    - gotify:proxy
+
+- name: Gotify Pi-Hole integration
+  when: pihole_enabled
+  import_tasks: gotify_pihole.yml
+  tags:
+    - gotify
+    - gotify:dns

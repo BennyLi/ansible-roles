@@ -1,0 +1,57 @@
+---
+
+#
+# General Local
+#
+  dockerfiles_path: '/home/.dockerfiles'
+
+
+#
+# General Remote
+#
+  docker_projects_path: '/docker/projects'
+
+
+#
+# Traefik
+#
+  traefik_enabled:            true
+  traefik_project_path:      '{{ docker_projects_path }}/traefik'
+  traefik_mount_config_path: '{{ traefik_project_path }}/mounts/config'
+
+  traefik_proxy_network_name: 'proxy-net'
+  traefik_macvlan_ip:         '192.168.0.2'
+
+
+#
+# Pi-Hole
+#
+  pihole_enabled:             true
+  pihole_project_path:        '{{ docker_projects_path }}/pihole'
+  pihole_mount_dnsmasq_path:  '{{ pihole_project_path }}/mounts/dnsmasq'
+
+
+#
+# Gotify
+#
+  gotify_project_path:          '{{ docker_projects_path }}/gotify'
+  gotify_mount_etc_config_path: '{{ gotify_project_path }}/mounts/etc/gotify'
+  gotify_mount_data_path:       '{{ gotify_project_path }}/mounts/data'
+  gotify_mount_db_path:         '{{ gotify_project_path }}/mounts/db'
+
+  gotify_domain:                'gotify.example.com'
+  gotify_app_hostname:          'gotify'
+  gotify_admin_user_name:       'gotify-admin'
+  gotify_admin_user_password:   'gotify admin password'
+  gotify_additional_users:
+    - username: 'testuser1'
+      password: 'testpass1'
+    - username: 'testuser2'
+      password: 'testpass2'
+
+  gotify_db_hostname:           'gotify-db'
+  gotify_db_root_password:      'db R00t password'
+  gotify_db_name:               'gotify'
+  gotify_db_user_name:          'gotify'
+  gotify_db_user_password:      'gotify password'
+

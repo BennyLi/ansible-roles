@@ -1,0 +1,42 @@
+---
+
+- name: Ensure the project directory exists
+  ansible.builtin.file:
+    path:  '{{ gotify_project_path }}'
+    state: directory
+
+- name: Ensure the Docker mount points exist
+  ansible.builtin.file:
+    path:  '{{ item }}'
+    state: directory
+  loop:
+    - '{{ gotify_mount_etc_config_path }}'
+    - '{{ gotify_mount_data_path }}'
+    - '{{ gotify_mount_db_path }}'
+
+- name: Copy docker-compose.yml
+  ansible.builtin.template:
+    src:  '{{ dockerfiles_path }}/gotify/docker-compose.yml'
+    dest: '{{ gotify_project_path }}/docker-compose.yml'
+
+- name: Copy Gotify config file
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/gotify/config.yml'
+    dest: '{{ gotify_mount_etc_config_path }}/config.yml'
+
+- name: Copy Gotify DB environment file
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/gotify/db.env'
+    dest: '{{ gotify_project_path }}/db.env'
+
+- name: Copy DB Healtcheck config file
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/gotify/db-healthcheck.conf'
+    dest: '{{ gotify_project_path }}/db-healthcheck.conf'
+
+- name: Start the Gotify stack
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ gotify_project_path }}'
+    pull:        yes
+    state:       present

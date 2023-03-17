@@ -1,0 +1,60 @@
+---
+
+- ansible.builtin.set_fact:
+    username: 'Täubchen'
+    password: '{{ item.password }}'
+
+- name: Get the list of Gotify users by calling the REST API
+  register:   gotify_user_list
+  ansible.builtin.uri:
+    url:      'https://{{ gotify_domain }}/user'
+    method:   'GET'
+    return_content:   true
+    force_basic_auth: true
+    user:     '{{ gotify_admin_user_name }}'
+    password: '{{ gotify_admin_user_password }}'
+
+- debug:
+    var: gotify_user_list
+
+      #- name: Get the number of users
+      #  ansible.builtin.set_fact:
+      #    gotify_user_count: '{{ gotify_user_list.json | community.general.json_query("[*].name | length(@)") }}'
+      #
+      #- debug:
+      #    var: gotify_user_count
+      #
+      #- debug:
+      #  when: gotify_user_count == 1
+      #    msg: '{{ gotify_user_list.json }}'
+
+- name: Find user in list
+  debug:
+    msg: "{{ gotify_user_list.json | community.general.json_query('[?name==\"' + username + '\"].name') }}"
+- debug:
+    msg: '{{ user_name }}'
+  loop: '{{ gotify_user_list.json | community.general.json_query("[*].name") }}'
+  loop_control:
+    loop_var: user_name
+
+      #- name: Check if the given user already exists
+      #  set_fact:
+      #    gotify_user: '{{ gotify_user_list.json | json_query(...) }}'
+      #
+      #- name: Create a new Gotify user by calling the REST API
+      #  when: gotify_user is undefined
+      #  register: gotify_user
+      #  ansible.builtin.uri:
+      #    url:      'https://{{ gotify_domain }}/user'
+      #    method:   'POST'
+      #    return_content: true
+      #    body_format: 'json'
+      #    body:
+      #      admin:  false
+      #      name:   '{{ params_user_name }}'
+      #      pass:   '{{ params_user_password }}'
+      #    force_basic_auth: true
+      #    user:     '{{ gotify_admin_user_name }}'
+      #    password: '{{ gotify_admin_user_password }}'
+      #
+      #
