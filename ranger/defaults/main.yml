@@ -1,0 +1,10 @@
+---
+
+user_name:  'john'
+user_group: 'doe'
+terminal_emulator: 'alacritty'
+
+dockerfiles_path: '/home/{{ user_name }}/.dockerfiles'
+is_docker_rootless_install: 'no'
+
+public_dotfiles_path: '/home/{{ user_name }}/.dotfiles/public'

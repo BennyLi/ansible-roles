@@ -1,0 +1,6 @@
+---
+
+- name: Setup Ranger file manager (running inside a docker container)
+  import_tasks: ranger_docker.yml
+  tags:
+    - ranger

@@ -1,0 +1,15 @@
+---
+
+- name: Build the ranger docker image locally
+  become: "{{ 'yes' if is_docker_rootless_install == 'no' else 'no' }}"
+  ansible.builtin.shell: './build.sh'
+  args:
+    chdir: '{{ dockerfiles_path }}/apps/ranger/'
+
+- name: 'Copy desktop launcher file template'
+  ansible.builtin.template:
+    src:   '{{ public_dotfiles_path }}/ranger/ranger_docker.desktop.j2'
+    dest:  '/home/{{ user_name }}/.local/share/applications/ranger_docker.desktop'
+    owner: '{{ user_name }}'
+    group: '{{ user_group }}'
+    mode:  'u=rw,g=,o'
