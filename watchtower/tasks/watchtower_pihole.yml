@@ -1,0 +1,8 @@
+---
+
+- name: Add PiHole DNS entry for Watchtower
+  import_tasks: '{{ ansible_roles_path }}/pihole/tasks/pihole_add_dns_entry.yml'
+  vars:
+    params_app_name: 'watchtower'
+    params_domain:   '{{ watchtower_domain }}'
+    params_ip:       '{{ traefik_macvlan_ip }}'

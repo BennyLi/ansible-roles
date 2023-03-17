@@ -1,0 +1,21 @@
+---
+
+- name: Setup Watchtower instance
+  import_tasks: watchtower_docker.yml
+  tags:
+    - watchtower
+    - watchtower:docker
+
+- name: Watchtower Traefik integration
+  when: traefik_enabled
+  import_tasks: watchtower_traefik.yml
+  tags:
+    - watchtower
+    - watchtower:proxy
+
+- name: Watchtower Pi-Hole integration
+  when: pihole_enabled
+  import_tasks: watchtower_pihole.yml
+  tags:
+    - watchtower
+    - watchtower:dns
