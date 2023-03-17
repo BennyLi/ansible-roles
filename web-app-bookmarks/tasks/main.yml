@@ -1,0 +1,12 @@
+---
+
+- name: Setup Chromium
+  import_tasks: chromium.yml
+  tags:
+    - bookmarks
+    - chromium
+
+- name: Install Bookmarks
+  import_tasks: bookmarks.yml
+  tags:
+    - bookmarks

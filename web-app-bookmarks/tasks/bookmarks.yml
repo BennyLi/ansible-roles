@@ -1,0 +1,21 @@
+---
+
+- name: Link web app helper script
+  become: yes
+  ansible.builtin.file:
+    state: link
+    src:   "{{ role_path }}/files/web-app-launch.sh"
+    dest:  "/usr/local/bin/web-app-launch"
+    mode:  u=rx,g=rx,o=rx
+
+- name: Copy icons for later usage
+  become: yes
+  ansible.builtin.copy:
+    src:  "{{ role_path }}/files/icons/gitmoji.png"
+    dest: /usr/share/pixmaps/gitmoji.png
+
+- name: Put the bookmarks via .desktop files in place
+  ansible.builtin.template:
+    src:  templates/web-app-bookmark.desktop
+    dest: "/home/{{ user_name }}/.local/share/applications/{{ item.filename }}.desktop"
+  loop: "{{ web_app_bookmarks }}"

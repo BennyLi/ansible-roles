@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name={{ item.name }}
+Categories=Network,WebBrowser,{{ item.categories }}
+Path=/usr/local/bin
+Exec=web-app-launch "{{ item.url }}"
+Icon={{ item.icon }}
+MimeType=x-scheme-handler/obsidian;

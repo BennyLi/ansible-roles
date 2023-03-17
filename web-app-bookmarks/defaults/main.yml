@@ -1,0 +1,11 @@
+---
+
+web_app_bookmarks: [
+  {
+    filename: gitmoji,
+    name:     gitmoji,
+    categories: Development,RevisionControl,
+    url:      https://gitmoji.dev/,
+    icon:     gitmoji
+  }
+]
