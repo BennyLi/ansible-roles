@@ -1,0 +1,39 @@
+---
+
+- name: Ensure the project directory exists
+  ansible.builtin.file:
+    path:  '{{ nextcloud_project_path }}'
+    state: directory
+
+- name: Ensure Docker mount points exist
+  ansible.builtin.file:
+    path:  '{{ item }}'
+    state: directory
+  loop:
+    - '{{ nextcloud_mount_dbdata_path }}'
+    - '{{ nextcloud_mount_apps_path }}'
+    - '{{ nextcloud_mount_data_path }}'
+
+- name: Copy the docker-compose.yml
+  ansible.builtin.template:
+    src:  '{{ dockerfiles_path }}/nextcloud/docker-compose.yml'
+    dest: '{{ nextcloud_project_path }}/docker-compose.yml'
+
+- name: Copy Nextcloud environment config files
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/nextcloud/{{ item }}'
+    dest: '{{ nextcloud_project_path }}/{{ item }}'
+  loop:
+    - app.env
+    - db.env
+
+- name: Copy DB Healtcheck config file
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/nextcloud/db-healthcheck.conf'
+    dest: '{{ nextcloud_project_path }}/db-healthcheck.conf'
+
+- name: Start the Nextcloud compose stack
+  become: yes
+  community.docker.docker_compose:
+    project_src: '{{ nextcloud_project_path }}'
+    pull:        yes

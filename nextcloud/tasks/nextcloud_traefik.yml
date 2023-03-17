@@ -1,0 +1,6 @@
+---
+
+- name: Copy Traefik config for Nextcloud application
+  ansible.builtin.template:
+    src:  '{{ public_dotfiles_path }}/nextcloud/nextcloud.traefik.yml'
+    dest: '{{ traefik_mount_config_path }}/dynamic_conf/nextcloud.traefik.yml'

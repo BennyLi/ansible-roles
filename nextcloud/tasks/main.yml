@@ -1,0 +1,40 @@
+---
+
+# TODOs: 
+#   - [x] Rewrite exisiting docker-compose.yml file
+#   - [x] Move env vars to .env files
+#   - [x] Add healthchecks to docker-compose file
+#     - [x] MariaDB
+#     - [x] Nextcloud
+#   - [x] Add script to handle updates and migrations
+#   - [ ] Add scripts for backup and restore
+#   - [ ] Setup a job to do automatic backups
+#   - [ ] Move secrets to vault
+#   - [ ] Setup a job to handle startup after reboot, 'cause normal docker start causes a race condition
+#   - [ ] Write file comments in all script files
+
+- name: Setup Nextcloud instance
+  import_tasks: nextcloud_docker.yml
+  tags:
+    - nextcloud
+    - nextcloud:docker
+
+- name: Nextcloud Traefik integration
+  when: traefik_enabled
+  import_tasks: nextcloud_traefik.yml
+  tags:
+    - nextcloud
+    - nextcloud:traefik
+
+- name: Nextcloud Pi-Hole integration
+  when: pihole_enabled
+  import_tasks: nextcloud_pihole.yml
+  tags:
+    - nextcloud
+    - nextcloud:dns
+
+- name: Nextcloud Backup configuration
+  import_tasks: nextcloud_backup.yml
+  tags:
+    - nextcloud
+    - nextcloud:backup
