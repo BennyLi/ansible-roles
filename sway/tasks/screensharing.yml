@@ -1,0 +1,24 @@
+---
+#
+# Source: https://elis.nu/blog/2021/02/detailed-setup-of-screen-sharing-in-sway/index.html
+#
+
+- name: Ensure dependencies for screensharing are met
+  become: yes
+  community.general.pacman:
+    name:
+      # - pipewire   # Installed in a seperate role
+      - xdg-desktop-portal
+      - xdg-desktop-portal-wlr
+
+#
+# Ensure to put this into your .profile/.bashrc/.zshrc ...:
+#
+  # XDG_SESSION_TYPE=wayland
+  # XDG_CURRENT_DESKTOP=sway
+
+#
+# Ensure to put this into your sway config:
+#
+   # exec systemctl --user import-environment XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
+   # exec dbus-update-activation-environment WAYLAND_DISPLAY

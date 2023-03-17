@@ -1,0 +1,9 @@
+---
+
+- name: Install swaylock and swayidle
+  become: yes
+  community.general.pacman:
+    name:
+      - swaylock
+      - swayidle
+    state: latest

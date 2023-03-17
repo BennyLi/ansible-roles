@@ -1,0 +1,9 @@
+---
+
+- name: Install Sway compositor
+  become: yes
+  community.general.pacman:
+    name: sway
+    state: latest
+
+# TODO Link configuration file

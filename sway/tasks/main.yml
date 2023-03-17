@@ -1,0 +1,30 @@
+---
+
+- name: Install and setup a basic Sway Desktop
+  import_tasks: sway.yml
+  tags:
+    - sway
+
+- name: Setup a lockscreen for Sway
+  import_tasks: sway_lockscreen.yml
+  tags:
+    - sway
+    - sway:lock
+
+- name: Setup wallpaper support for Sway
+  import_tasks: sway_wallpaper.yml
+  tags:
+    - sway
+    - sway:wallpaper
+
+- name: Apply screensharing fix
+  import_tasks: screensharing.yml
+  tags:
+    - sway
+    - sway:screensharing
+
+- name: Setup Sway configuration for all parts
+  import_tasks: sway_config.yml
+  tags:
+    - sway
+    - sway:config

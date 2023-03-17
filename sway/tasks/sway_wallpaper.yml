@@ -1,0 +1,7 @@
+---
+
+- name: Install swaybg
+  become: yes
+  community.general.pacman:
+    name: swaybg
+    state: latest

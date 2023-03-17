@@ -1,0 +1,353 @@
+# For reference see https://man.archlinux.org/man/sway.5.en
+
+################################################################################
+#
+# Variables
+#
+################################################################################
+
+# Logo key. Use Mod1 for Alt.
+set $mod                Mod4
+
+# Home row direction keys, like vim
+set $left               h
+set $down               j
+set $up                 k
+set $right              l
+
+# Your preferred terminal emulator
+set $term               alacritty
+
+# Your preferred application launcher
+# Note: pass the final command to swaymsg so that the resulting window can be opened
+# on the original workspace that the command was run on.
+set $menu               exec $term --class=launcher -e ~/.local/src/sway-launcher-desktop/sway-launcher-desktop.sh
+
+# Timeouts [in seconds]
+set $lock_timout        120
+set $display_timout     600
+
+# Workspaces
+set $ws1_1              '1.1'
+set $ws1_2              '1.2'
+set $ws2_1              '2.1'
+set $ws2_2              '2.2'
+set $ws3_1              '3.1'
+set $ws3_2              '3.2'
+set $ws4_1              '4.1'
+set $ws4_2              '4.2'
+set $ws5_1              '5.1'
+set $ws5_2              '5.2'
+set $ws6_1              '6.1'
+set $ws6_2              '6.2'
+set $ws7_1              '7.1'
+set $ws7_2              '7.2'
+set $ws8_1              '8.1'
+set $ws8_2              '8.2'
+set $ws9_1              '9.1'
+set $ws9_2              '9.2'
+set $ws0_1              '0.1'
+set $ws0_2              '0.2'
+
+#
+# Colors
+#
+  set $white            #FFFFFF
+  set $black            #000000
+  set $lightgray        #AAAAAA
+  set $darkgray         #666666
+
+  set $iteragenta       #9D1681
+  set $iteragenta25     #E7C5E0
+  set $iteragenta50     #CE8BC0
+  set $yellow           #FFE500
+  set $yellow25         #FEF8CB
+  set $yellow50         #FFF280
+  set $mint             #00B2BB
+  set $mint25           #BFECEE
+  set $mint50           #7FD8DD
+
+  set $no_tranparency           FF
+  set $light_transperency       AA
+  set $strong_transperency      55
+  set $transparent              00
+
+  set $primary_color            $mint50
+  set $primary_color_light      $mint
+  set $primary_color_background $black
+  set $primary_color_inactive   $darkgray
+  set $secondary_color          $yellow
+  set $third_color              $iteragenta
+
+
+################################################################################
+#
+# Behavior configuration
+#
+################################################################################
+
+# Focus the window under the cursor,
+# even if we move windows to other workspaces or outputs.
+focus_follows_mouse     always
+
+
+################################################################################
+#
+# Output configuration
+#
+################################################################################
+
+# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
+#output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+output * bg ~/Pictures/wallpapers/unsplash/wakeup-kickass-repeat_justin-veenema.jpg fill
+#output * bg $(find ~Pictures/wallpapers/ -type f | shuf -n1) fill
+
+
+# Example configuration:
+#
+#   output HDMI-A-1 resolution 1920x1080 position 1920,0
+#
+# You can get the names of your outputs by running: swaymsg -t get_outputs
+
+
+#
+# Window decorations
+#
+  default_orientation        vertical
+  gaps inner                 20
+  titlebar_padding           20 8
+  default_border             pixel 1
+  titlebar_border_thickness  3
+  client.focused             $primary_color_background$transparent $primary_color_background$light_transperency  $primary_color           $third_color    $secondary_color$strong_transperency
+  client.focused_inactive    $primary_color_background$transparent $primary_color_background$strong_transperency $primary_color_light     $third_color    $primary_color_background$no_tranparency
+  client.unfocused           $primary_color_background$transparent $primary_color_background$strong_transperency $primary_color_inactive  $third_color    $primary_color_background$no_tranparency
+
+################################################################################
+#
+# Idle configuration
+#
+################################################################################
+
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 300 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
+exec swayidle -w \
+         timeout $lock_timout    'swaylock --image ~/Pictures/wallpapers/iteratec/Laptop10.png --ignore-empty-password --show-failed-attempts --show-keyboard-layout --daemonize' \
+         timeout $display_timout 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+         before-sleep            'swaylock --image ~/Pictures/wallpapers/iteratec/Laptop10.png --ignore-empty-password --show-failed-attempts --show-keyboard-layout --daemonize'
+
+
+################################################################################
+#
+# Input configuration
+#
+################################################################################
+
+# You can get the names of your inputs by running: swaymsg -t get_inputs
+# Read `man 5 sway-input` for more information about this section.
+
+input * {
+    xkb_layout                "de"
+    xkb_variant               "neo,nodeadkeys"
+    xkb_options               "grp:win_space_toggle"
+}
+
+input type:touchpad {
+    dwt                       enabled
+    natural_scroll            enabled
+    middle_emulation          enabled
+    scroll_method             two_finger
+    tap                       disabled
+}
+
+
+################################################################################
+#
+# Key bindings
+#
+################################################################################
+
+#
+# Basics:
+#
+    # Start a terminal
+    bindsym $mod+Return       exec $term
+
+    # Kill focused window
+    bindsym $mod+Shift+q      kill
+
+    # Start your launcher
+    for_window [app_id="^launcher$"] floating enable, sticky enable, resize set 60 ppt 30 ppt, border pixel 3
+    bindsym $mod+d            exec $menu
+
+    # Drag floating windows by holding down $mod and left mouse button.
+    # Resize them with right mouse button + $mod.
+    # Despite the name, also works for non-floating windows.
+    # Change normal to inverse to use left mouse button for resizing and right
+    # mouse button for dragging.
+    floating_modifier $mod    normal
+
+    # Reload the configuration file
+    bindsym $mod+Shift+c      reload
+
+    # Exit sway (logs you out of your Wayland session)
+    bindsym $mod+Shift+e      exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+#
+# Media control:
+#
+    # TODO
+    # pactl set-sink-volume @DEFAULT_SINK@ 50%
+#
+# Custom things
+#
+    # Emoji picker
+    bindsym $mod++Ctrl+v       exec rofimoji --action clipboard --skin-tone neutral
+#
+# Moving around:
+#
+    # Move your focus around
+    bindsym $mod+$left        focus left
+    bindsym $mod+$down        focus down
+    bindsym $mod+$up          focus up
+    bindsym $mod+$right       focus right
+
+    # Move the focused window with the same, but add Shift
+    bindsym $mod+Shift+$left  move left
+    bindsym $mod+Shift+$down  move down
+    bindsym $mod+Shift+$up    move up
+    bindsym $mod+Shift+$right move right
+#
+# Workspaces:
+#
+    # Switch to workspace
+    bindsym $mod+1            workspace $ws1_1
+    bindsym $mod+Ctrl+1       workspace $ws1_2
+    bindsym $mod+2            workspace $ws2_1
+    bindsym $mod+Ctrl+2       workspace $ws2_2
+    bindsym $mod+3            workspace $ws3_1
+    bindsym $mod+Ctrl+3       workspace $ws3_2
+    bindsym $mod+4            workspace $ws4_1
+    bindsym $mod+Ctrl+4       workspace $ws4_2
+    bindsym $mod+5            workspace $ws5_1
+    bindsym $mod+Ctrl+5       workspace $ws5_2
+    bindsym $mod+6            workspace $ws6_1
+    bindsym $mod+Ctrl+6       workspace $ws6_2
+    bindsym $mod+7            workspace $ws7_1
+    bindsym $mod+Ctrl+7       workspace $ws7_2
+    bindsym $mod+8            workspace $ws8_1
+    bindsym $mod+Ctrl+8       workspace $ws8_2
+    bindsym $mod+9            workspace $ws9_1
+    bindsym $mod+Ctrl+9       workspace $ws9_2
+    bindsym $mod+0            workspace $ws0_1
+    bindsym $mod+Ctrl+0       workspace $ws0_2
+    # Move focused container to workspace
+    bindsym $mod+Shift+1      move container to workspace $ws1_1
+    bindsym $mod+Shift+Ctrl+1 move container to workspace $ws1_2
+    bindsym $mod+Shift+2      move container to workspace $ws2_1
+    bindsym $mod+Shift+Ctrl+2 move container to workspace $ws2_2
+    bindsym $mod+Shift+3      move container to workspace $ws3_1
+    bindsym $mod+Shift+Ctrl+3 move container to workspace $ws3_2
+    bindsym $mod+Shift+4      move container to workspace $ws4_1
+    bindsym $mod+Shift+Ctrl+4 move container to workspace $ws4_2
+    bindsym $mod+Shift+5      move container to workspace $ws5_1
+    bindsym $mod+Shift+Ctrl+5 move container to workspace $ws5_2
+    bindsym $mod+Shift+6      move container to workspace $ws6_1
+    bindsym $mod+Shift+Ctrl+6 move container to workspace $ws6_2
+    bindsym $mod+Shift+7      move container to workspace $ws7_1
+    bindsym $mod+Shift+Ctrl+7 move container to workspace $ws7_2
+    bindsym $mod+Shift+8      move container to workspace $ws8_1
+    bindsym $mod+Shift+Ctrl+8 move container to workspace $ws8_2
+    bindsym $mod+Shift+9      move container to workspace $ws9_1
+    bindsym $mod+Shift+Ctrl+9 move container to workspace $ws9_2
+    bindsym $mod+Shift+0      move container to workspace $ws0_1
+    bindsym $mod+Shift+Ctrl+0 move container to workspace $ws0_2
+    # Move workspaces around
+    bindsym $mod+Ctrl+$left   move workspace to output left
+    bindsym $mod+Ctrl+$right  move workspace to output right
+#
+# Layout stuff:
+#
+    bindsym $mod+s            splith
+    bindsym $mod+v            splitv
+
+    bindsym $mod+w            layout tabbed
+    bindsym $mod+e            layout toggle split
+
+    bindsym $mod+f            fullscreen
+
+    # Toggle the current focus between tiling and floating mode
+    bindsym $mod+Shift+space  floating toggle
+
+    bindsym $mod+space        focus mode_toggle
+    bindsym $mod+a            focus parent
+#
+# Scratchpad:
+#
+    # Sway has a "scratchpad", which is a bag of holding for windows.
+    # You can send windows there and get them back later.
+
+    # Move the currently focused window to the scratchpad
+    bindsym $mod+Shift+minus  move scratchpad
+
+    # Show the next scratchpad window or hide the focused scratchpad window.
+    # If there are multiple scratchpad windows, this command cycles through them.
+    bindsym $mod+minus        scratchpad show
+#
+# Resizing containers:
+#
+mode "resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    bindsym $left             resize shrink width  10px
+    bindsym $down             resize grow   height 10px
+    bindsym $up               resize shrink height 10px
+    bindsym $right            resize grow   width  10px
+
+    # Return to default mode
+    bindsym Return            mode "default"
+    bindsym Escape            mode "default"
+}
+bindsym $mod+r                mode "resize"
+
+#
+# Status Bar:
+#
+# Read `man 5 sway-bar` for more information about this section.
+bar {
+    position top
+
+    # When the status_command prints a new line to stdout, swaybar updates.
+    # The default just shows the current date and time.
+    status_command while date +'%d %b %Y %H:%M:%S ⌚'; do sleep 1; done
+
+    colors {
+        statusline            $third_color
+        background            $black$strong_transperency
+        focused_workspace     $primary_color_background$no_tranparency $primary_color_background$no_tranparency $primary_color
+        active_workspace      $primary_color_background$no_tranparency $primary_color_background$no_tranparency $primary_color_light
+        inactive_workspace    $black$strong_transperency               $black$strong_transperency               $primary_color_inactive
+    }
+}
+
+
+
+################################################################################
+#
+# Autostart
+#
+################################################################################
+
+#
+# Screensharing fix
+#
+#  exec systemctl --user import-environment XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
+#  exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
+
+
+
+
+
+include /etc/sway/config.d/*

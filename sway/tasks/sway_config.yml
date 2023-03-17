@@ -1,0 +1,12 @@
+---
+
+- name: Ensure config directory exists
+  ansible.builtin.file:
+    path:  "/home/{{ user_name }}/.config/sway"
+    state: directory
+
+- name: Link configuratoion file
+  ansible.builtin.file:
+    src:   "{{ role_path }}/files/config"
+    dest:  "/home/{{ user_name }}/.config/sway/config"
+    state: link
